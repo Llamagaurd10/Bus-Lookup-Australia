@@ -1,3 +1,7 @@
+from fastapi import FastAPI
+
+app = FastAPI()
+
 @app.post("/lookup")
 def lookup(data: PlateRequest, mode: str = "real"):
     plate = data.plate.strip()
