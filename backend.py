@@ -7,7 +7,7 @@ import random
 
 app = FastAPI()
 
-# Enable CORS so the frontend can access the backend
+# Allow frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,11 +15,11 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# Request body format
+# Request body model
 class PlateRequest(BaseModel):
     plate: str
 
-# Silly placeholder database
+# Silly placeholder data
 silly_database = [
     {
         "operator": "Ducklines Transport",
@@ -51,7 +51,7 @@ def lookup(data: PlateRequest, mode: str = "real"):
     if mode == "silly":
         return random.choice(silly_database)
 
-    # Otherwise, search the real site
+    # Attempt to search the real fleetlists site
     url = "https://fleetlists.busaustralia.com/index.php"
     form_data = {
         "searchtype": "numberplate",
@@ -74,7 +74,6 @@ def lookup(data: PlateRequest, mode: str = "real"):
     if len(rows) < 2:
         return {"error": "No data rows found."}
 
-    # Extract the first data row
     columns = rows[1].find_all("td")
     if len(columns) < 7:
         return {"error": "Unexpected table format."}
@@ -86,3 +85,8 @@ def lookup(data: PlateRequest, mode: str = "real"):
         "body": columns[3].text.strip(),
         "notes": columns[6].text.strip()
     }
+
+# Optional root route to fix 404 from HEAD / or GET /
+@app.get("/")
+def root():
+    return {"status": "Bus Lookup Backend is running 🚍"}
