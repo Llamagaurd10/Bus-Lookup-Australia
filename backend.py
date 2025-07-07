@@ -51,7 +51,6 @@ def lookup(data: PlateRequest, mode: str = "real"):
     if mode == "silly":
         return random.choice(silly_database)
 
-    # Attempt to search the real fleetlists site
     url = "https://fleetlists.busaustralia.com/index.php"
     form_data = {
         "searchtype": "numberplate",
@@ -68,7 +67,10 @@ def lookup(data: PlateRequest, mode: str = "real"):
     table = soup.find("table", class_="data")
 
     if not table:
-        return {"error": "No results found."}
+        return {
+            "error": "No results found.",
+            "debug": soup.prettify()[:1000]  # First 1000 chars of HTML
+        }
 
     rows = table.find_all("tr")
     if len(rows) < 2:
