@@ -86,7 +86,6 @@ def lookup(data: PlateRequest, mode: str = "real"):
         "notes": columns[6].text.strip()
     }
 
-# Optional root route to fix 404 from HEAD / or GET /
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {"status": "Bus Lookup Backend is running 🚍"}
